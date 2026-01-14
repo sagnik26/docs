@@ -25,8 +25,8 @@
                 <DocsFeatureScopeMarker v-if="page.editions || page.version || page.deprecated || page.release"
                                         :page="page"/>
 
-                <!-- Top TOC for configuration page -->
-                <TopToc v-if="isConfigurationPage" :page="page" />
+                <!-- Top TOC - shown when ::toc:: directive is present in markdown -->
+                <TopToc v-if="showTopToc" :page="page" />
                 
                 <ContentRenderer class="bd-markdown" v-if="page" :value="page"/>
 
@@ -56,8 +56,26 @@
     const route = useRoute()
     const slug = computed(() => `/docs/${route.params.slug instanceof Array ? route.params.slug.join('/') : route.params.slug}`);
 
-     // Check if this is the configuration page
-    const isConfigurationPage = computed(() => slug.value === '/docs/configuration' || slug.value === '/docs/configuration/');
+    // Check if ::toc:: directive is present in the page content
+    const showTopToc = computed(() => {
+        if (!page.value) return false;
+        
+        // Check the raw markdown content if available
+        if (page.value._raw?.body) {
+            return page.value._raw.body.includes('::toc::');
+        }
+        
+        // Fallback: check the body structure for toc component
+        if (page.value.body) {
+            const bodyText = JSON.stringify(page.value.body);
+            return bodyText.includes('::toc::') || 
+                   bodyText.includes('"type":"toc"') || 
+                   bodyText.includes('"tag":"toc"') ||
+                   bodyText.includes('"component":"Toc"');
+        }
+        
+        return false;
+    });
 
     const fetchNavigation = async () => {
         const {data: fetched, error} = await useAsyncData(

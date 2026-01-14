@@ -3,6 +3,8 @@ title: Configuration
 icon: /docs/icons/admin.svg
 ---
 
+::toc::
+
 Configuration reference for Kestra.
 
 Almost everything in Kestra is configurable. This page covers key options such as data sources, logging, security, and AI.
