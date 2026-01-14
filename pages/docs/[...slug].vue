@@ -25,6 +25,9 @@
                 <DocsFeatureScopeMarker v-if="page.editions || page.version || page.deprecated || page.release"
                                         :page="page"/>
 
+                <!-- Top TOC for configuration page -->
+                <TopToc v-if="isConfigurationPage" :page="page" />
+                
                 <ContentRenderer class="bd-markdown" v-if="page" :value="page"/>
 
                 <template v-if="!page?.meta?.isHomepage">
@@ -42,6 +45,7 @@
     import NavSideBar from "~/components/docs/NavSideBar.vue";
     import Breadcrumb from "~/components/layout/Breadcrumb.vue";
     import NavToc from "~/components/docs/NavToc.vue";
+    import TopToc from "~/components/docs/TopToc.vue";
     import HelpfulVote from "~/components/docs/HelpfulVote.vue";
     import {hash} from "ohash";
     import {generatePageNames, recursivePages} from "~/utils/navigation";
@@ -51,6 +55,9 @@
 
     const route = useRoute()
     const slug = computed(() => `/docs/${route.params.slug instanceof Array ? route.params.slug.join('/') : route.params.slug}`);
+
+     // Check if this is the configuration page
+    const isConfigurationPage = computed(() => slug.value === '/docs/configuration' || slug.value === '/docs/configuration/');
 
     const fetchNavigation = async () => {
         const {data: fetched, error} = await useAsyncData(
@@ -131,7 +138,11 @@
     }
 
     const {navigation, pageList, pageNames} = await fetchNavigation();
-
+    console.log('navigation --- ', navigation);
+    console.log('pageList --- ', pageList);
+    console.log('pageNames --- ', pageNames);
+    console.log('page --- ', page);
+    
     await useContentHead(page);
 </script>
 
